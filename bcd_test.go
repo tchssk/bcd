@@ -22,7 +22,10 @@ var encDecTests = []encDecTest{
 func TestEncode(t *testing.T) {
 	for i, test := range encDecTests {
 		dst := make([]byte, EncodedLen(len(test.dec)))
-		n := Encode(dst, test.dec)
+		n, err := Encode(dst, test.dec)
+		if err != nil {
+			t.Errorf("#%d: bad return value: got: %d want: %d", i, n, len(dst))
+		}
 		if n != len(dst) {
 			t.Errorf("#%d: bad return value: got: %d want: %d", i, n, len(dst))
 		}
@@ -35,8 +38,8 @@ func TestEncode(t *testing.T) {
 func TestDecode(t *testing.T) {
 	for i, test := range encDecTests {
 		dst := make([]byte, DecodedLen(len(test.enc)))
-		n, err := Decode(dst, test.enc)
-		if err != nil {
+		n := Decode(dst, test.enc)
+		if n != len(dst) {
 			t.Errorf("#%d: bad return value: got: %d want: %d", i, n, len(dst))
 		}
 		if bytes.Equal(dst, test.dec) != true {
